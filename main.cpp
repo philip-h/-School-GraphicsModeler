@@ -1,7 +1,7 @@
 /* CS 3GC3 - Texturing sample
  * by R. Teather
  */
-#include <GL/glut.h>
+#include "Header.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

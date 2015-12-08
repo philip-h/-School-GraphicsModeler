@@ -2,7 +2,7 @@
 #define __NODEMODEL_H__
 
 #include "node.h"
-#include <GL/glut.h>
+#include "Header.h"
 
 enum ModelType{
 	Sphere,
