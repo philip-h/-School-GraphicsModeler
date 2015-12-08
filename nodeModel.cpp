@@ -1,6 +1,6 @@
 #include "nodeModel.h"
 #include <stdio.h> //needed for printf command
-#include <GL/freeglut.h>
+#include "Header.h"
 
 NodeModel::NodeModel(ModelType whatType){	//constructor
 	nodeType = model;

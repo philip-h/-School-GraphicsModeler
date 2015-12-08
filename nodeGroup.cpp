@@ -1,6 +1,6 @@
 #include "nodeGroup.h"
 #include <stdio.h> //needed for printf command
-#include <GL/glut.h>
+#include "Header.h"
 
 NodeGroup::NodeGroup(){
 	nodeType = group;

@@ -1,6 +1,6 @@
 #include "nodeTransform.h"
 #include <stdio.h> //needed for printf command
-#include <GL/glut.h>
+#include "Header.h"
 
 //for gltranslate and gl scale
 NodeTransform::NodeTransform(transformType whatType, Vector3D vec3){
