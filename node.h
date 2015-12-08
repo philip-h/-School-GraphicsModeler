@@ -6,7 +6,7 @@
 //Nodes
 
 #include <vector>
-using namespace std;
+// using namespace std;
 
 extern int getID();
 
@@ -26,7 +26,7 @@ public:
 	NodeType nodeType;
 	bool isDrawable;
 	int ID;
-	vector<Node*> *children;
+	std::vector<Node*> *children;
 	Node* parent;
 	int currentChild;
 

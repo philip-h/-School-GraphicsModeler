@@ -5,7 +5,7 @@ Node::Node(){	//constructor
 	ID = getID();
 	nodeType = root; //base class will be only really our root node, so lets do that
 	isDrawable = false;
-	children = new vector<Node*>();
+	children = new std::vector<Node*>();
 	parent = 0;
 	currentChild = 0;
 	printf("node init done\n");

@@ -62,7 +62,7 @@ SceneGraph *SG;
 //function which will populate a sample graph 
 void initGraph(){
 	/* Vector to hold the initial shapes of the scene*/
-	vector<ModelType> models;
+	std::vector<ModelType> models;
 	/* Initial transformation objects*/
 	NodeTransform *translation;
 	/* Node model to draw the shape */
@@ -72,7 +72,7 @@ void initGraph(){
 
 	/* Vector to hold the initial positions of each shape in the scene */
 	Vector3D initialPosition;
-	vector<Vector3D> shapeLocations;
+	std::vector<Vector3D> shapeLocations;
 
 	initialPosition.x = 1;
 	initialPosition.y = 0;
