@@ -1,7 +1,9 @@
 #ifndef __SCENEGRAPH_H__	//guard against cyclic dependancy
 #define __SCENEGRAPH_H__
 
+#include <vector>
 #include "node.h"
+#include "structs.h"
 
 class SceneGraph{
 public:
@@ -15,11 +17,14 @@ public:
 	void deleteThisNode();					
 	//Scene Graph Draw
 	void draw();
-	Node *currentNode;
+	void clearScene();
+	std::vector<Vector3D> getTransformations();
 
 private:
-	
+	Node *currentNode;
 	Node *rootNode;
+	std::vector<Vector3D> translationVector;
+	std::vector<Vector3D> getTransformations(Node *node);
 };
 
 #endif

@@ -17,9 +17,12 @@ void SceneGraph::goToRoot(){
 //moves to a child node i
 void SceneGraph::goToChild(int i){
 	if (i < currentNode->children->size() && i >= 0)
+	{
 		currentNode = currentNode->children->at(i);
-	else
+	} else
+	{
 		printf("child out of range");
+	}
 }
 
 void SceneGraph::goToParent(){
@@ -33,11 +36,65 @@ void SceneGraph::insertChildNodeHere(Node *node){
 }
 
 //deletes the current node, relinking the children as necessary
+/* DOES NOT WORK */
 void SceneGraph::deleteThisNode(){
-	//TODO
+	if (currentNode->children->size() != 0)
+		return;
+	else
+	{
+
+		/*Delete this node from the parent's vector*/
+		printf("ID of child: %d\n", currentNode->ID);
+		//printf("ID of parent before change: %d\n", currentNode->parent->ID);
+		goToParent();
+		printf("ID of parent: %d\n", currentNode->ID);
+		currentNode->children->pop_back();
+		deleteThisNode();
+	}
 }
 
 //draw the scenegraph
 void SceneGraph::draw(){
 	rootNode->draw();
+}
+
+//Clear the scengraph
+void SceneGraph::clearScene()
+{
+	goToRoot();
+	currentNode->children->clear();
+}
+
+std::vector<Vector3D> SceneGraph::getTransformations()
+{
+	goToRoot();
+	return getTransformations(currentNode);
+}
+
+std::vector<Vector3D> SceneGraph::getTransformations(Node *node)
+{
+	if (node->isTransformation)
+		translationVector.push_back(node->getShapePosition());
+
+	if (node->children->size() > 0)
+	{
+		for (int i = 0; i < node->children->size(); i++)
+		{
+			getTransformations(node->children->at(i));
+		}
+	}
+
+	/* Remove all the -1,-1,-1, for those are rotations and scalings */
+	for (int i = 0; i < translationVector.size(); i++)
+	{
+		if (translationVector[i].x == -1 && 
+			translationVector[i].y == -1 && 
+			translationVector[i].z == -1)
+		{
+			translationVector.erase(translationVector.begin() + i);
+		}
+	}
+
+	return translationVector;
+
 }

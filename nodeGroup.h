@@ -9,6 +9,7 @@ public:
 
 	virtual void nodeSpecificCodeDown();
 	virtual void nodeSpecificCodeUp();
+	virtual void describeNode();
 };
 
 #endif

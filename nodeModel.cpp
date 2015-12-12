@@ -1,5 +1,5 @@
 #include "nodeModel.h"
-#include <stdio.h> //needed for printf command
+#include <stdio.h> 
 #include "Header.h"
 
 NodeModel::NodeModel(ModelType whatType){	//constructor
@@ -14,15 +14,12 @@ void NodeModel::nodeSpecificCodeDown(){
 	
 	switch (modelType){
 	case Sphere:
-		glColor3f(1.0f, 0.0f, 0.0f);
-		glutSolidSphere(0.5, 12, 10);
+		glutSolidSphere(0.75, 12, 10);
 		break;
 	case Cube:
-		glColor3f(0.84, 0.65, 0.23);
 		glutSolidCube(1);
 		break;
 	case Teapot:
-		glColor3f(0.0f, 0.0f, 0.0f);
 		glutSolidTeapot(.67);
 		break;
 	case Custom:
@@ -30,4 +27,25 @@ void NodeModel::nodeSpecificCodeDown(){
 		break;
 	}
 	
+}
+
+void NodeModel::describeNode()
+{
+	printf("This is a model node: drawing a ");
+	switch (modelType){
+	case Sphere:
+		printf("Sphere\n");
+		break;
+	case Cube:
+		printf("Cube\n");
+		break;
+	case Teapot:
+		printf("Teapot\n");
+		break;
+	case Custom:
+		//own mesh thing
+		printf("Custom Shape\n");
+		break;
+	}
+
 }

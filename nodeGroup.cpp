@@ -13,3 +13,8 @@ void NodeGroup::nodeSpecificCodeDown(){
 void NodeGroup::nodeSpecificCodeUp(){
 	glPopMatrix();
 }
+
+void NodeGroup::describeNode()
+{
+	printf("This is a group node!\n");
+}

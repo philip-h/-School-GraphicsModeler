@@ -6,6 +6,7 @@
 //Nodes
 
 #include <vector>
+#include "structs.h"
 // using namespace std;
 
 extern int getID();
@@ -25,6 +26,7 @@ public:
 
 	NodeType nodeType;
 	bool isDrawable;
+	bool isTransformation;
 	int ID;
 	std::vector<Node*> *children;
 	Node* parent;
@@ -33,6 +35,8 @@ public:
 	void draw();
 	virtual void nodeSpecificCodeDown();
 	virtual void nodeSpecificCodeUp();
+	virtual Vector3D getShapePosition();
+	virtual void describeNode();
 };
 
 #endif

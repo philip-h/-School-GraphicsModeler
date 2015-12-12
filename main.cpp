@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "structs.h"
- #include "PMath/PVector.h"
+#include "PMath/PVector.h"
 
 /* Rotations on the 3 axes */
 float xyzRotation[] = {-11, 40, 0};
@@ -39,12 +39,7 @@ float diff1[4] = {0, 0, 0, 1};
 float spec1[4] = {1, 1, 1, 1}; 
 
 /* MATERIALS */
-float m_amb[3] = {0.05375, 0.05, 0.06625}; 
-float m_diff[3] = {0.18275, 0.17, 0.22525};  
-float m_spec[3] = {0.332741, 0.328634, 0.346435}; 
-float shiny = 0.3f; 
-
-
+Obsidian lol;
 
 //node ids
 int masterID = 0;
@@ -61,78 +56,102 @@ SceneGraph *SG;
 
 //function which will populate a sample graph 
 void initGraph(){
+
 	/* Vector to hold the initial shapes of the scene*/
 	std::vector<ModelType> models;
 	/* Initial transformation objects*/
-	NodeTransform *translation;
+	NodeTransform *translation, *translation1y;
+	NodeTransform *rotation;
+	NodeTransform *scale;
 	/* Node model to draw the shape */
 	NodeModel *model;
 	/* Node group for transformations */
-	NodeGroup *group = new NodeGroup();;
+	NodeGroup *group;
 
 	/* Vector to hold the initial positions of each shape in the scene */
 	Vector3D initialPosition;
-	std::vector<Vector3D> shapeLocations;
+	std::vector<Vector3D> standLocations;
 
 	initialPosition.x = 1;
 	initialPosition.y = 0;
 	initialPosition.z = 2;
-	shapeLocations.push_back(initialPosition);
-	models.push_back(Cube);
+	standLocations.push_back(initialPosition);
 
-	initialPosition.x = 1;
-	initialPosition.y = 1;
-	initialPosition.z = 2;
-	shapeLocations.push_back(initialPosition);
 	models.push_back(Sphere);
 
 	initialPosition.x = 5;
 	initialPosition.y = 0;
 	initialPosition.z = 2;
-	shapeLocations.push_back(initialPosition);
-	models.push_back(Cube);
+	standLocations.push_back(initialPosition);
 
-	initialPosition.x = 5;
-	initialPosition.y = 1;
-	initialPosition.z = 2;
-	shapeLocations.push_back(initialPosition);
 	models.push_back(Sphere);
 
 	initialPosition.x = 1;
 	initialPosition.y = 0;
 	initialPosition.z = 5;
-	shapeLocations.push_back(initialPosition);
-	models.push_back(Cube);
+	standLocations.push_back(initialPosition);
 
-	initialPosition.x = 1;
-	initialPosition.y = 1;
-	initialPosition.z = 5;
-	shapeLocations.push_back(initialPosition);
 	models.push_back(Sphere);
 
 	initialPosition.x = 5;
 	initialPosition.y = 0;
 	initialPosition.z = 6;
-	shapeLocations.push_back(initialPosition);
-	models.push_back(Cube);
+	standLocations.push_back(initialPosition);
 
-	initialPosition.x = 5;
-	initialPosition.y = 1;
-	initialPosition.z = 6;
-	shapeLocations.push_back(initialPosition);
 	models.push_back(Teapot);
+
+	Vector3D shapeLocation;
+	shapeLocation.x = 0;
+	shapeLocation.y = 1;
+	shapeLocation.z = 0;
+	translation1y = new NodeTransform(Translate, shapeLocation);
+
 
 	/* All shapes start out with no rotation */
 	/*All shapes start with a scale factor of 1*/
 	
+
+	/* IMPLEMENT THE STAND LOCATION AND HARD CODE CUBE AND STUFF */
 	for (int i = 0; i < models.size(); i++)
 	{
 
-		/* Apply translation to each shaps*/
-		translation = new NodeTransform(Translate, shapeLocations[i]);
-		SG->insertChildNodeHere(translation);
+		group = new NodeGroup();
+		SG->insertChildNodeHere(group);
 		SG->goToChild(i);
 
+		/*Apply rotation to each stand*/
+		rotation = new NodeTransform(Rotate);
+		SG->insertChildNodeHere(rotation);
+		SG->goToChild(0);
+		/* Apply scaling to each stand*/
+		scale = new NodeTransform(Scale);
+		SG->insertChildNodeHere(scale);
+		SG->goToChild(0);
+		/* Apply translation to each stand*/
+		translation = new NodeTransform(Translate, standLocations[i]);
+		SG->insertChildNodeHere(translation);
+		SG->goToChild(0);
+		/* Draw each stand */
+		model = new NodeModel(Cube);
+		SG->insertChildNodeHere(model);
+		SG->goToChild(0);
+		
+
+		/* Apply rotation to each shape */
+		rotation = new NodeTransform(Rotate);
+		SG->insertChildNodeHere(rotation);
+		SG->goToChild(0);
+		/* Apply scaling to each ojbect */
+		scale = new NodeTransform(Scale);
+		SG->insertChildNodeHere(scale);
+		SG->goToChild(0);
+		/*
+			Apply translation to each shape. This is just a translation of
+			1 in the y relative to the stand!
+		*/
+		translation1y = new NodeTransform(Translate, shapeLocation);
+		SG->insertChildNodeHere(translation1y);
+		SG->goToChild(0);
 		/* Draw each shape */
 		model = new NodeModel(models[i]);
 		SG->insertChildNodeHere(model);
@@ -142,15 +161,17 @@ void initGraph(){
 
 void drawAxis()
 {
+	glDisable(GL_LIGHTING);
 	glBegin(GL_LINES);
 	glColor3f(0, 0, 0);
 	glVertex3f(0,0,0);
-	glVertex3f(50,0,0);
+	glVertex3f(500,0,0);
 	glVertex3f(0,0,0);
-	glVertex3f(0,50,0);
+	glVertex3f(0,500,0);
 	glVertex3f(0,0,0);
-	glVertex3f(0,0,50);
+	glVertex3f(0,0,500);
 	glEnd();
+	glEnable(GL_LIGHTING);
 }
 
 void drawLight()
@@ -169,11 +190,6 @@ void drawLight()
 	glPopMatrix();
 
 	glEnable(GL_LIGHTING);
-}
-
-void sceneTranslate()
-{
-
 }
 
 void lockCamera()
@@ -214,10 +230,10 @@ void lockCamera()
 }
 
 /* Moves camera positions along a vector*/
-void moveCamera(PVector3f v, float amt)
+void moveCamera(PVector3f dirVector, float amt)
 {
-	cam = cam + (v*amt);
-	lockCamera();
+	cam = cam + (dirVector*amt);
+	//lockCamera();
 }
 
 //callbacks
@@ -309,9 +325,20 @@ void keyboard(unsigned char key, int x, int y)
 			light_pos1[2]--;
 			light_pos1[0]--;
 		}
+	} 
+
+	/* Clear the scene */
+	else if (key == 'r')
+	{
+		SG->clearScene();
+
 	}
 
-	cam.giveValue();
+	/* Restore original Scene */
+	else if (key == 'x')
+	{
+		initGraph();
+	}
 
 	glutPostRedisplay();
 }
@@ -334,10 +361,8 @@ void special(int key, int x, int y)
       	case GLUT_KEY_DOWN:
 	        xyzRotation[0]++;
 	        break;
-  }
-  lockCamera();
-
-  	printf("%f, %f, %f \n", xyzRotation[0], xyzRotation[1], xyzRotation[2]);
+ 	}
+  	// lockCamera();
 
 	glutPostRedisplay();
 }
@@ -364,9 +389,17 @@ void init(void)
 	//init our scenegraph
 	SG = new SceneGraph();
 
-	//add various nodes
 	//initializing our world
 	initGraph();
+
+	std::vector<Vector3D> trans;
+
+	trans = SG->getTransformations();
+
+	for (std::vector<Vector3D>::iterator i = trans.begin(); i != trans.end(); ++i)
+	{
+		printf("(%.2f,%.2f,%.2f)\n", (*i).x, (*i).y, (*i).z);
+	}
 }
 
 
@@ -397,10 +430,10 @@ void display(void)
 	glLightfv(GL_LIGHT1, GL_SPECULAR, spec1);
 
 	 /* MATERIALS */
-  	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  m_amb); 
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  m_diff); 
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  m_spec); 
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS,  shiny); 
+  	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,  lol.m_amb); 
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  lol.m_diff); 
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  lol.m_spec); 
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS,  lol.shiny); 
 
 	drawAxis();
 	drawLight();

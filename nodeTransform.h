@@ -3,7 +3,7 @@
 
 #include "node.h"
 #include "structs.h"
-enum transformType{
+enum TransformType{
 	Translate,
 	Rotate,
 	Scale
@@ -11,15 +11,17 @@ enum transformType{
 
 class NodeTransform:public Node{
 public:
-	NodeTransform(transformType whatType, Vector3D vec3);	//constructor
-	NodeTransform(transformType whatType, Vector4D vec4);
+	NodeTransform(TransformType whatType, Vector3D vec3);	//constructor
+	NodeTransform(TransformType whatType, Vector4D vec4);
+	NodeTransform(TransformType whatType);
 
-	transformType transformationType;
+	TransformType transformationType;
 	Vector3D amount3;
 	Vector4D amount4;
 
 	virtual void nodeSpecificCodeDown();
-	virtual void nodeSpecificCodeUp();
+	virtual Vector3D getShapePosition();
+	virtual void describeNode();
 };
 
 #endif

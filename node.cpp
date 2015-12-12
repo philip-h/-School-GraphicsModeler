@@ -5,6 +5,7 @@ Node::Node(){	//constructor
 	ID = getID();
 	nodeType = root; //base class will be only really our root node, so lets do that
 	isDrawable = false;
+	isTransformation = false;
 	children = new std::vector<Node*>();
 	parent = 0;
 	currentChild = 0;
@@ -42,3 +43,9 @@ void Node::nodeSpecificCodeDown(){}
 
 //code where we add what the node will do when moving up the tree
 void Node::nodeSpecificCodeUp(){}
+
+Vector3D Node::getShapePosition(){}
+
+void Node::describeNode(){
+	printf("This is the root node!... numberOfChildren is %d\n", children->size());
+}

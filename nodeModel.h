@@ -17,6 +17,7 @@ public:
 	ModelType modelType;
 
 	virtual void nodeSpecificCodeDown();
+	virtual void describeNode();
 };
 
 #endif
