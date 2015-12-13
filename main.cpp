@@ -397,16 +397,10 @@ void moveShape(PVector3f dirVector, float amt)
 {
 	/* Shape vector for translations */
 	PVector3f shapeTrans = (dirVector*amt);
-	printf("%f %f %f\n", shapeTrans.x, shapeTrans.y, shapeTrans.z);
 
 	selectedShapeNode->amount3.x -= shapeTrans.x;
 	selectedShapeNode->amount3.y -= shapeTrans.y;
 	selectedShapeNode->amount3.z -= shapeTrans.z;
-
-	selectedShapeNode->describeNode();
-
-	Node* parent = SG->getParentOfID(selectedShapeNode->ID);
-	parent->describeNode();
 }
 
 //callbacks
@@ -474,6 +468,54 @@ void keyboard(unsigned char key, int x, int y)
 		} else if (shapeControl == SHAPES)
 		{
 			moveShape(down, shapeSpeed);
+		}
+	}
+
+	/* u and i to scale up and down */
+	else if (key == 'u')
+	{
+		if(shapeControl == SHAPES)
+		{
+			/*Scale node is parent of selected node*/
+			Node *scaleNode = SG->getParentOfID(selectedShapeNode->ID);
+			scaleNode->amount3.x -= 0.3;
+			scaleNode->amount3.y -= 0.3;
+			scaleNode->amount3.z -= 0.3;
+		}
+	} else if (key == 'i')
+	{
+		if(shapeControl == SHAPES)
+		{
+			/*Scale node is parent of selected node*/
+			Node *scaleNode = SG->getParentOfID(selectedShapeNode->ID);
+			scaleNode->amount3.x += 0.3;
+			scaleNode->amount3.y += 0.3;
+			scaleNode->amount3.z += 0.3;
+		}
+	}
+
+	/* o and p to rotate*/
+	else if (key == 'u')
+	{
+		if(shapeControl == SHAPES)
+		{
+			/*rotation node is parent of the parent of selected node*/
+			Node *rotateNode = SG->getParentOfID((SG->getParentOfID(selectedShapeNode->ID))->ID);
+			rotateNode->amount4.x = 0;
+			rotateNode->amount4.y = 1;
+			rotateNode->amount4.z = 0;
+			rotateNode->amount4.w = 1;
+		}
+	} else if (key == 'i')
+	{
+		if(shapeControl == SHAPES)
+		{
+			/*rotation node is parent of the parent of selected node*/
+			Node *rotateNode = SG->getParentOfID((SG->getParentOfID(selectedShapeNode->ID))->ID);
+			rotateNode->amount4.x = 0;
+			rotateNode->amount4.y = 1;
+			rotateNode->amount4.z = 0;
+			rotateNode->amount4.w = 1;
 		}
 	}
 
@@ -708,6 +750,9 @@ void display(void)
 
 void printStartMenu()
 {
+	printf("\n");
+	printf("\n");
+	printf("\n");
 	printf("\033[H\033[J");
 	printf("***********************************\n");
 	printf("****  Jimmy & Philip's Modeler  ***\n");
@@ -735,7 +780,9 @@ void printStartMenu()
 	printf("***********************************\n");
 	printf("This program, we swear, is haunted..\n");
 	printf("(1) If a bunch of shapes stack up on eachother, make clean and re make....\n");
-	printf("(2) Moving our objects works most of the time; sometimes I think OpenGL gives up!\n");
+	printf("(2) Transforming our objects works most of the time; sometimes I think OpenGL gives up!\n");
+	printf("\tWe think it has something to do with all the reference passing...  but hours have shown no progress\n");
+
 }
 
 /* main function - program entry point */
