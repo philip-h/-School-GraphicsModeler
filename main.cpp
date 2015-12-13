@@ -303,6 +303,7 @@ void Intersect(int x, int y)
 	if (selectedShapeNode != 0)
 	{	
 		printf("shapes\n");
+		selectedShapeNode->describeNode();
 		shapeControl = SHAPES;
 	} else 
 	{
@@ -401,10 +402,10 @@ void keyboard(unsigned char key, int x, int y)
 	}
 
 	/*CAMERA CONTROL AND SHAPE CONTROL*/
-	else if (shapeControl == SCENE)
-	{
+	// else if (shapeControl == SCENE)
+	// {
 		/*WASD+Space+z to control the camera*/
-		if (key == 'w')
+		else if (key == 'w')
 		{
 			moveCamera(forward, cameraSpeed);
 		} else if (key == 'a')
@@ -424,29 +425,29 @@ void keyboard(unsigned char key, int x, int y)
 		{
 			moveCamera(down, cameraSpeed);
 		}
-	} else if (shapeControl == SHAPES)
-	{
-		if (key == 'w')
-		{
-			selectedShapeNode->describeNode();
-		} else if (key == 'a')
-		{
-			//moveCamera(left, cameraSpeed);
-		} else if (key == 's')
-		{
-			//moveCamera(back, cameraSpeed);
-		} else if (key == 'd')
-		{
-			//moveCamera(right, cameraSpeed);
-			/* Space bar */
-		}  else if (key == 32)
-		{
-			//moveCamera(up, cameraSpeed);
-		} else if (key == 'c')
-		{
-			//moveCamera(down, cameraSpeed);
-		}
-	}
+	// } else if (shapeControl == SHAPES)
+	// {
+	// 	else if (key == 'w')
+	// 	{
+	// 		selectedShapeNode->describeNode();
+	// 	} else if (key == 'a')
+	// 	{
+	// 		//moveCamera(left, cameraSpeed);
+	// 	} else if (key == 's')
+	// 	{
+	// 		//moveCamera(back, cameraSpeed);
+	// 	} else if (key == 'd')
+	// 	{
+	// 		//moveCamera(right, cameraSpeed);
+	// 		/* Space bar */
+	// 	}  else if (key == 32)
+	// 	{
+	// 		//moveCamera(up, cameraSpeed);
+	// 	} else if (key == 'c')
+	// 	{
+	// 		//moveCamera(down, cameraSpeed);
+	// 	}
+	// }
 
 	/*Z to toggle between moving light sources */
 	else if (key == 'z')

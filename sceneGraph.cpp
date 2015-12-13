@@ -103,23 +103,16 @@ Node* SceneGraph::highlightSelectedShape(int id)
 
 Node* SceneGraph::highlightSelectedShapes(int id, Node* node)
 {
-	Node *selectedNode;
+	
 	if (id == node->ID)
 	{
-		if (node->children->at(1)->selectedID == node->children->at(1)->ID)
-		{
-			node->children->at(1)->selectedID = 0;
-			return 0;
-		}else
-		{
-			unhighlightAllShapes(rootNode);
-			node->children->at(1)->selectedID = node->children->at(1)->ID;
-			return node;
-		}
-
+		unhighlightAllShapes(rootNode);
+		node->children->at(1)->selectedID = node->children->at(1)->ID;
+		return node;
 	}
 	else
 	{
+		Node *selectedNode;
 		if (node->children->size() > 0)
 		{
 			for (int i = 0; i < node->children->size(); i++)
