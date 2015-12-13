@@ -21,7 +21,7 @@ int CURRENT = 0;
 double start[] ={0,0,0}, end[]={1,1,1};
 
 //-1 for no shape currently selected.
-int selectedShapeID = -1;
+int selectedShapeID;
 
 /* drawPolygon - takes 4 indices and an array of vertices
  *   and draws a polygon using the vertices indexed by the indices
@@ -101,77 +101,96 @@ void keyboard(unsigned char key, int x, int y)
  * This method returns an array of intersection point. If the ray intersects the bounding box then
  * return the closest intersection point. If no intersection return empty array.
  */
-std::vector<vertex3D> checkCollision(BoundedBox box, Ray ray){
+int checkCollision(std::vector<BoundedBox> shapes, Ray ray){
 	// printf("orig x: %f, y: %f, z: %f\n", ray.orig.x, ray.orig.y, ray.orig.z);
 	// printf("direction x: %f, y: %f, z: %f\n", ray.dir.x, ray.dir.y, ray.dir.z);
+
+	double smallestTmin = 100000;
+	int selectedShape = -1;
+
+	printf("shapeID: %d, shapeID: %d\n", shapes[0].shapeId, shapes[1].shapeId);
 
 	//contains array with our closest intersection point of the ray to our bounded box. If empty no intersection.
 	std::vector<vertex3D> intersectPoint;
 
-	//Get the bounding points of our box
-	vertex3D min = box.min; //p1
-	vertex3D max = box.max; //p2
+	for (int i=0; i<shapes.size(); i++){
+		BoundedBox box = shapes[i];
 
- 	double tmin = (min.x - ray.orig.x) / ray.dir.x;
-	double tmax = (max.x - ray.orig.x) / ray.dir.x;
+		//Get the bounding points of our box
+		vertex3D min = box.min; //p1
+		vertex3D max = box.max; //p2
 
-	if (tmin > tmax){
-		std::swap(tmin, tmax);
+		printf("shapeID: %d min (%f, %f, %f) max: (%f, %f, %f) \n", shapes[i].shapeId < 3, min.x, min.y, min.z, max.x, max.y, max.z);
+
+	 	double tmin = (min.x - ray.orig.x) / ray.dir.x;
+		double tmax = (max.x - ray.orig.x) / ray.dir.x;
+
+		if (tmin > tmax){
+			std::swap(tmin, tmax);
+		}
+
+		double tymin = (min.y - ray.orig.y) / ray.dir.y;
+		double tymax = (max.y - ray.orig.y) / ray.dir.y;
+
+		if (tymin > tymax){
+			std::swap(tymin, tymax);
+		}
+
+		printf("tmin: %f, tmax %f, tymin %f, tymax %f \n", tmin, tmax, tymin, tymax);
+
+		if ((tmin > tymax) || (tymin > tmax)) {
+			printf("No intersection y\n");
+			continue; // no intersection point continue to next bounded box
+		}
+
+		if (tymin > tmin) {
+			tmin = tymin;
+		}
+
+		if (tymax < tmax){
+			tmax = tymax;
+		}
+
+		double tzmin = (min.z - ray.orig.z) / ray.dir.z;
+		double tzmax = (max.z - ray.orig.z) / ray.dir.z;
+
+		if (tzmin > tzmax){
+			std::swap(tzmin, tzmax);
+		}
+
+		if ((tmin > tzmax) || (tzmin > tmax)){
+			printf("No intersection z \n");
+			continue; // no intersection point continue to next bounded box
+		}
+
+		if (tzmin > tmin){
+			tmin = tzmin;
+		}
+
+		if (tzmax < tmax){
+			tmax = tzmax;
+		}
+
+		//There is an intersection point. Now we want to check if it is the closest intersection point to our ray.
+		//If so then remove the previous intersection point and set it to this new intersection point.
+		if (tmin < smallestTmin){
+			smallestTmin = tmin;
+			intersectPoint.clear();
+			vertex3D point;
+			point.x = ray.orig.x + ray.dir.x*tmin;
+			point.y = ray.orig.y + ray.dir.y*tmin;
+			point.z = ray.orig.z + ray.dir.z*tmin;
+			selectedShape = box.shapeId;
+			intersectPoint.push_back(point);
+			printf("closest point: (%f,%f,%f) \n", point.x, point.y, point.z);
+		}
 	}
-
-	double tymin = (min.y - ray.orig.y) / ray.dir.y;
-	double tymax = (max.y - ray.orig.y) / ray.dir.y;
-
-	if (tymin > tymax){
-		std::swap(tymin, tymax);
-	}
-
-	if ((tmin > tymax) || (tymin > tmax)) {
-		return intersectPoint; //false no intersection return empty intersect point array
-	}
-
-	if (tymin > tmin) {
-		tmin = tymin;
-	}
-
-	if (tymax < tmax){
-		tmax = tymax;
-	}
-
-	double tzmin = (min.z - ray.orig.z) / ray.dir.z;
-	double tzmax = (max.z - ray.orig.z) / ray.dir.z;
-
-	if (tzmin > tzmax){
-		std::swap(tzmin, tzmax);
-	}
-
-	if ((tmin > tzmax) || (tzmin > tmax)){
-		return intersectPoint; //false no intersection return empty intersect point array
-	}
-
-	if (tzmin > tmin){
-		tmin = tzmin;
-	}
-
-	if (tzmax < tmax){
-		tmax = tzmax;
-	}
-
-	vertex3D point;
-	point.x = ray.orig.x + ray.dir.x*tmin;
-	point.y = ray.orig.y + ray.dir.y*tmin;
-	point.z = ray.orig.z + ray.dir.z*tmin;
-
-	intersectPoint.push_back(point);
-
-	printf("closest point: (%f,%f,%f) \n", point.x, point.y, point.z);
-
 	//true there is an intersection. return the intersect point in array.
-	return intersectPoint;
+	return selectedShape;
 }
 
 //function which preforms intersection test
-bool Intersect(int x, int y){
+void Intersect(int x, int y){
 	// printf("%i, %i\n", x, y);
 
 	//allocate matricies memory
@@ -198,42 +217,29 @@ bool Intersect(int x, int y){
 	gluUnProject(winX, winY, 1.0, matModelView, matProjection,
          viewport, &end[0], &end[1], &end[2]);
 
-
-	// printf("near point: %f,%f,%f\n", start[0], start[1], start[2]);
-	// printf("far point: %f,%f,%f\n", end[0], end[1], end[2]);
-
 	//create new ray with the origin as the mouse click start position
 	Ray ray = Ray(start, end);
 
 	//boxes are defined by 2 points p1, p2
-	double box1Min[] = {-5, -1, -1};
-	double box1Max[] = {-4, 1, 1};
+	double box1Min[] = {-4.5, -0.5, -0.5};
+	double box1Max[] = {-3.5, 0.5, 0.5};
 	BoundedBox box1 = BoundedBox(box1Min, box1Max, 2);
 
-	double box2Min[] = {-1,-1,-1};
-	double box2Max[] = {1,1,1};
+	double box2Min[] = {-0.5,-0.5,-0.5};
+	double box2Max[] = {0.5,0.5,0.5};
 	BoundedBox box2 = BoundedBox(box2Min, box2Max, 1);
+
+	double box3Min[] = {-1.5,-1.5,-0.5};
+	double box3Max[] = {-0.5,-0.5,0.5};
+	BoundedBox box3 = BoundedBox(box3Min, box3Max, 3);
 
 	std::vector<BoundedBox> shapes;
 	shapes.push_back(box1);
 	shapes.push_back(box2);
+	shapes.push_back(box3);
 
-	double closest_distance = -1;
-	for (int i=0; i<shapes.size(); i++){
-		std::vector<vertex3D> intersectPoint = checkCollision(shapes[i], ray);
-		printf("Intersection: %i ShapeID: %i with p1: (%f,%f,%f) p2: (%f,%f,%f) \n",
-					 intersectPoint.empty(),
-					 shapes[i].shapeId,
-					 shapes[i].min.x, shapes[i].min.y, shapes[i].min.z,
-					 shapes[i].max.x, shapes[i].max.y, shapes[i].max.z);
-
-		if (!intersectPoint.empty()){
-			selectedShapeID = shapes[i].shapeId;
-		}
-	}
-
-
-	return false; //else returns false
+	selectedShapeID = checkCollision(shapes, ray);
+	printf("selectedShapeID: %d\n", selectedShapeID);
 }
 
 
@@ -343,7 +349,6 @@ void display(void)
 		glVertex3f(end[0], end[1], end[2]);
 	glEnd();
 
-
 	//center at origin (0,0,0) with radius 1
 	//so p1: (-1,-1,-1) p2: (1,1,1)
 	glColor3f(1,1,1);
@@ -359,12 +364,24 @@ void display(void)
 	glutSolidCube(1);
 	glPopMatrix(); //resets orgin for next object
 
+	glPushMatrix(); //sets orgin as draw point
+	glColor3f(0.5,0,0.55);
+	glTranslatef(-1, -1, 0);
+	glutSolidCube(1);
+	glPopMatrix(); //resets orgin for next object
+
+	printf("selectedShapeID: %d\n", selectedShapeID);
+
 	if (selectedShapeID == 1){
 		float boundedBoxCenter1[] = {0,0,0};
 		drawBox(boundedBoxCenter1, 1.0, 1.0 , 1.0);
 	}
 	if (selectedShapeID == 2){
 		float boundedBoxCenter2[] = {-5,0,0};
+		drawBox(boundedBoxCenter2, 1.0, 1.0 , 1.0);
+	}
+	if (selectedShapeID == 3){
+		float boundedBoxCenter2[] = {-1,-1,0};
 		drawBox(boundedBoxCenter2, 1.0, 1.0 , 1.0);
 	}
 
