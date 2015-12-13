@@ -26,7 +26,9 @@ public:
 
 	NodeType nodeType;
 	bool isDrawable;
-	bool isTransformation;
+	bool isTranslation;
+	bool isRotation;
+	bool isScale;
 	int ID;
 	std::vector<Node*> *children;
 	Node* parent;

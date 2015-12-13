@@ -65,16 +65,16 @@ void SceneGraph::clearScene()
 	currentNode->children->clear();
 }
 
-std::vector<Vector3D> SceneGraph::getTransformations()
+std::vector<Node*> SceneGraph::getTransformations()
 {
 	goToRoot();
 	return getTransformations(currentNode);
 }
 
-std::vector<Vector3D> SceneGraph::getTransformations(Node *node)
+std::vector<Node*> SceneGraph::getTransformations(Node *node)
 {
-	if (node->isTransformation)
-		translationVector.push_back(node->getShapePosition());
+	if (node->isTranslation)
+		translationVector.push_back(node);
 
 	if (node->children->size() > 0)
 	{
@@ -84,19 +84,38 @@ std::vector<Vector3D> SceneGraph::getTransformations(Node *node)
 		}
 	}
 
-	/* Remove all the -1,-1,-1, for those are rotations and scalings */
-	for (int i = 0; i < translationVector.size(); i++)
-	{
-		if (translationVector[i].x == -1 && 
-			translationVector[i].y == -1 && 
-			translationVector[i].z == -1)
-		{
-			translationVector.erase(translationVector.begin() + i);
-		}
-	}
-
 	return translationVector;
 
+}
+
+Node* SceneGraph::findNodeById(int id)
+{
+	if (id == -1)
+		return NULL;
+	else
+	{
+		goToRoot();
+		findNodeById(id, currentNode);
+	}
+}
+
+Node* SceneGraph::findNodeById(int id, Node* node)
+{
+	if (id == node->ID)
+	{
+		printf("");
+		return node;
+	}
+	else
+	{
+		if (node->children->size() > 0)
+		{
+			for (int i = 0; i < node->children->size(); i++)
+			{
+				findNodeById(id, node->children->at(i));
+			}
+		}
+	}
 }
 
 void SceneGraph::printTree()

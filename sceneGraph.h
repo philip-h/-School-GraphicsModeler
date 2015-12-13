@@ -18,15 +18,17 @@ public:
 	//Scene Graph Draw
 	void draw();
 	void clearScene();
-	std::vector<Vector3D> getTransformations();
+	std::vector<Node*> getTransformations();
 	void printTree();
+	Node* findNodeById(int id);
 
 private:
 	void printTree(Node *node);
 	Node *currentNode;
 	Node *rootNode;
-	std::vector<Vector3D> translationVector;
-	std::vector<Vector3D> getTransformations(Node *node);
+	std::vector<Node*> translationVector;
+	std::vector<Node*> getTransformations(Node *node);
+	Node* findNodeById(int id, Node *node);
 };
 
 #endif

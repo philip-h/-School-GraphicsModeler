@@ -7,3 +7,6 @@
 #  include <GL/glu.h>
 #  include <GL/freeglut.h>
 #endif
+
+#include <cmath>
+#include <algorithm>
