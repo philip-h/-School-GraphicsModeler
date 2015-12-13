@@ -706,6 +706,38 @@ void display(void)
 	glutSwapBuffers();
 }
 
+void printStartMenu()
+{
+	printf("\033[H\033[J");
+	printf("***********************************\n");
+	printf("****  Jimmy & Philip's Modeler  ***\n");
+	printf("***********************************\n");
+	printf("\n");
+	printf("NOTE: The keys have changed from what was on the assignment!!!\n");
+	printf("------------- CONTROLS ----------- \n");
+	printf("WASD to move up right down and left\n");
+	printf("Spacebar to move up, c to crouch (move down)\n");
+	printf("Mouse to pick the object... now WASD moves object!!\n");
+	printf("TFGH to move LIGT up right down and left\n");
+	printf("Arrow keys to rotate map\n");
+	printf("\n");
+	printf("Rest of the controls!\n");
+	printf("r - reset the model\n");
+	printf("x - bring back initial model\n");
+	printf("DEL - delete selected object\n");
+	printf("n - add object to origin\n");
+	printf("z - toggle which light source you wish to move\n");
+	printf("1 - change to texture 1\n");
+	printf("2 - change to texture 2\n");
+	printf("3 - change to texture 3\n");
+	printf("***********************************\n");
+	printf("****       SMALL NOTE           ***\n");
+	printf("***********************************\n");
+	printf("This program, we swear, is haunted..\n");
+	printf("(1) If a bunch of shapes stack up on eachother, make clean and re make....\n");
+	printf("(2) Moving our objects works most of the time; sometimes I think OpenGL gives up!\n");
+}
+
 /* main function - program entry point */
 int main(int argc, char** argv)
 {
@@ -725,6 +757,8 @@ int main(int argc, char** argv)
 	glutMouseFunc(mouse);
 
 	init();
+
+	printStartMenu();
 
 	glutMainLoop();				//starts the event loop
 	return(0);					//return may not be necessary on all compilers
