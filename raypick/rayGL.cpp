@@ -97,76 +97,7 @@ void keyboard(unsigned char key, int x, int y)
 }
 
 
-/**
- * This method returns an array of intersection point. If the ray intersects the bounding box then
- * return the closest intersection point. If no intersection return empty array.
- */
-int checkCollision(std::vector<BoundedBox> shapes, Ray ray){
-	double smallestTmin = 100000;
-	int selectedShape = -1;
 
-	for (int i=0; i<shapes.size(); i++){
-		BoundedBox box = shapes[i];
-
-		//Get the bounding points of our box
-		vertex3D min = box.min; //p1
-		vertex3D max = box.max; //p2
-
-	 	double tmin = (min.x - ray.orig.x) / ray.dir.x;
-		double tmax = (max.x - ray.orig.x) / ray.dir.x;
-
-		if (tmin > tmax){
-			std::swap(tmin, tmax);
-		}
-
-		double tymin = (min.y - ray.orig.y) / ray.dir.y;
-		double tymax = (max.y - ray.orig.y) / ray.dir.y;
-
-		if (tymin > tymax){
-			std::swap(tymin, tymax);
-		}
-
-		if ((tmin > tymax) || (tymin > tmax)) {
-			continue; // no intersection for this bounded box continue to next
-		}
-
-		if (tymin > tmin) {
-			tmin = tymin;
-		}
-
-		if (tymax < tmax){
-			tmax = tymax;
-		}
-
-		double tzmin = (min.z - ray.orig.z) / ray.dir.z;
-		double tzmax = (max.z - ray.orig.z) / ray.dir.z;
-
-		if (tzmin > tzmax){
-			std::swap(tzmin, tzmax);
-		}
-
-		if ((tmin > tzmax) || (tzmin > tmax)){
-			continue; // no intersection for this bounded box continue to next
-		}
-
-		if (tzmin > tmin){
-			tmin = tzmin;
-		}
-
-		if (tzmax < tmax){
-			tmax = tzmax;
-		}
-
-		//There is an intersection point. Now we want to check if it is the closest intersection point to our ray.
-		//If so then remove the previous intersection point and set it to this new intersection point.
-		if (tmin < smallestTmin){
-			smallestTmin = tmin;
-			selectedShape = box.shapeId;
-		}
-	}
-	//true that there is an intersection. return the shapeId of the intersected shape nearest to the ray
-	return selectedShape;
-}
 
 //function which preforms intersection test
 void Intersect(int x, int y){

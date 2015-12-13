@@ -3,6 +3,7 @@
 
 Node::Node(){	//constructor
 	ID = getID();
+	selectedID = 0;
 	nodeType = root; //base class will be only really our root node, so lets do that
 	isDrawable = false;
 	isTranslation = false;

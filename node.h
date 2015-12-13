@@ -30,6 +30,7 @@ public:
 	bool isRotation;
 	bool isScale;
 	int ID;
+	int selectedID;
 	std::vector<Node*> *children;
 	Node* parent;
 	int currentChild;
