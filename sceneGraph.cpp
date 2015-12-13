@@ -98,3 +98,22 @@ std::vector<Vector3D> SceneGraph::getTransformations(Node *node)
 	return translationVector;
 
 }
+
+void SceneGraph::printTree()
+{	
+	goToRoot();
+	printTree(currentNode);
+}
+
+void SceneGraph::printTree(Node *node)
+{
+	node->describeNode();
+
+	if (node->children->size() > 0)
+	{
+		for (int i = 0; i < node->children->size(); i++)
+		{
+			printTree(node->children->at(i));
+		}
+	}
+}

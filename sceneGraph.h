@@ -19,8 +19,10 @@ public:
 	void draw();
 	void clearScene();
 	std::vector<Vector3D> getTransformations();
+	void printTree();
 
 private:
+	void printTree(Node *node);
 	Node *currentNode;
 	Node *rootNode;
 	std::vector<Vector3D> translationVector;

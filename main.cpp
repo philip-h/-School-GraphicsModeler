@@ -7,6 +7,7 @@
 #include <math.h>
 #include "structs.h"
 #include "PMath/PVector.h"
+#include "BoundedBox.h"
 
 /* Rotations on the 3 axes */
 float xyzRotation[] = {-11, 40, 0};
@@ -54,63 +55,78 @@ int getID(){
 #include "nodeTransform.h"
 SceneGraph *SG;
 
+//Vector of bounded boxes
+std::vector<BoundedBox> boundedBoxes;
+
 //function which will populate a sample graph 
 void initGraph(){
 
-	/* Vector to hold the initial shapes of the scene*/
-	std::vector<ModelType> models;
-	/* Initial transformation objects*/
-	NodeTransform *translation, *translation1y;
-	NodeTransform *rotation;
-	NodeTransform *scale;
-	/* Node model to draw the shape */
-	NodeModel *model;
+
 	/* Node group for transformations */
 	NodeGroup *group;
+	/* Initial transformation objects*/
+	NodeTransform *translation, *rotation, *scale;
+	/* Node model to draw the shape */
+	NodeModel *model;
+	/* Vector to hold the initial shapes of the scene*/
+	std::vector<ModelType> models;
+	
 
 	/* Vector to hold the initial positions of each shape in the scene */
 	Vector3D initialPosition;
-	std::vector<Vector3D> standLocations;
+	std::vector<Vector3D> shapeLocations;
 
 	initialPosition.x = 1;
 	initialPosition.y = 0;
 	initialPosition.z = 2;
-	standLocations.push_back(initialPosition);
+	shapeLocations.push_back(initialPosition);
+	models.push_back(Cube);
 
+	initialPosition.x = 1;
+	initialPosition.y = 1;
+	initialPosition.z = 2;
+	shapeLocations.push_back(initialPosition);
 	models.push_back(Sphere);
 
 	initialPosition.x = 5;
 	initialPosition.y = 0;
 	initialPosition.z = 2;
-	standLocations.push_back(initialPosition);
+	shapeLocations.push_back(initialPosition);
+	models.push_back(Cube);
 
+	initialPosition.x = 5;
+	initialPosition.y = 1;
+	initialPosition.z = 2;
+	shapeLocations.push_back(initialPosition);
 	models.push_back(Sphere);
 
 	initialPosition.x = 1;
 	initialPosition.y = 0;
 	initialPosition.z = 5;
-	standLocations.push_back(initialPosition);
+	shapeLocations.push_back(initialPosition);
+	models.push_back(Cube);
 
+	initialPosition.x = 1;
+	initialPosition.y = 1;
+	initialPosition.z = 5;
+	shapeLocations.push_back(initialPosition);
 	models.push_back(Sphere);
 
 	initialPosition.x = 5;
 	initialPosition.y = 0;
 	initialPosition.z = 6;
-	standLocations.push_back(initialPosition);
+	shapeLocations.push_back(initialPosition);
+	models.push_back(Cube);
 
+	initialPosition.x = 5;
+	initialPosition.y = 1;
+	initialPosition.z = 6;
+	shapeLocations.push_back(initialPosition);
 	models.push_back(Teapot);
-
-	Vector3D shapeLocation;
-	shapeLocation.x = 0;
-	shapeLocation.y = 1;
-	shapeLocation.z = 0;
-	translation1y = new NodeTransform(Translate, shapeLocation);
-
 
 	/* All shapes start out with no rotation */
 	/*All shapes start with a scale factor of 1*/
 	
-
 	/* IMPLEMENT THE STAND LOCATION AND HARD CODE CUBE AND STUFF */
 	for (int i = 0; i < models.size(); i++)
 	{
@@ -128,34 +144,39 @@ void initGraph(){
 		SG->insertChildNodeHere(scale);
 		SG->goToChild(0);
 		/* Apply translation to each stand*/
-		translation = new NodeTransform(Translate, standLocations[i]);
+		translation = new NodeTransform(Translate, shapeLocations[i]);
 		SG->insertChildNodeHere(translation);
 		SG->goToChild(0);
 		/* Draw each stand */
-		model = new NodeModel(Cube);
-		SG->insertChildNodeHere(model);
-		SG->goToChild(0);
-		
-
-		/* Apply rotation to each shape */
-		rotation = new NodeTransform(Rotate);
-		SG->insertChildNodeHere(rotation);
-		SG->goToChild(0);
-		/* Apply scaling to each ojbect */
-		scale = new NodeTransform(Scale);
-		SG->insertChildNodeHere(scale);
-		SG->goToChild(0);
-		/*
-			Apply translation to each shape. This is just a translation of
-			1 in the y relative to the stand!
-		*/
-		translation1y = new NodeTransform(Translate, shapeLocation);
-		SG->insertChildNodeHere(translation1y);
-		SG->goToChild(0);
-		/* Draw each shape */
 		model = new NodeModel(models[i]);
 		SG->insertChildNodeHere(model);
+
+		model = new NodeModel(WireCube);
+		SG->insertChildNodeHere(model);
+
 		SG->goToRoot();
+	}
+}
+
+void calcShapeBoundedBoxes()
+{
+	boundedBoxes.clear();
+	std::vector<Vector3D> trans = SG->getTransformations();
+
+	Vector3D p1, p2;
+	for (int i = 0; i < trans.size(); i++)
+	{
+		p1.x = trans[i].x - 0.5f;
+		p1.y = trans[i].y + 0.5f;
+		p1.z = trans[i].z - 0.5f;
+
+		p2.x = trans[i].x + 0.5f;
+		p2.y = trans[i].y - 0.5f;
+		p2.z = trans[i].z + 0.5f;
+
+		BoundedBox boundedBox(p1,p2,0);
+		boundedBoxes.push_back(boundedBox);
+
 	}
 }
 
@@ -392,14 +413,6 @@ void init(void)
 	//initializing our world
 	initGraph();
 
-	std::vector<Vector3D> trans;
-
-	trans = SG->getTransformations();
-
-	for (std::vector<Vector3D>::iterator i = trans.begin(); i != trans.end(); ++i)
-	{
-		printf("(%.2f,%.2f,%.2f)\n", (*i).x, (*i).y, (*i).z);
-	}
 }
 
 
@@ -439,6 +452,7 @@ void display(void)
 	drawLight();
 	//draw the sceneGraph
 	SG->draw();
+	calcShapeBoundedBoxes();
 
 	glutSwapBuffers();
 }

@@ -14,10 +14,16 @@ void NodeModel::nodeSpecificCodeDown(){
 	
 	switch (modelType){
 	case Sphere:
-		glutSolidSphere(0.75, 12, 10);
+		glutSolidSphere(0.6, 12, 10);
 		break;
 	case Cube:
 		glutSolidCube(1);
+		break;
+	case WireCube:
+		glDisable(GL_LIGHTING);
+		glColor3f(0.0f, 1.0f, 0.0f);
+		glutWireCube(1);
+		glEnable(GL_LIGHTING);
 		break;
 	case Teapot:
 		glutSolidTeapot(.67);
@@ -38,6 +44,9 @@ void NodeModel::describeNode()
 		break;
 	case Cube:
 		printf("Cube\n");
+		break;
+	case WireCube:
+		printf("WireCube\n");
 		break;
 	case Teapot:
 		printf("Teapot\n");
