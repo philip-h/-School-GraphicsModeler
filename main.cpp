@@ -401,6 +401,11 @@ void moveShape(PVector3f dirVector, float amt)
 	selectedShapeNode->amount3.x -= shapeTrans.x;
 	selectedShapeNode->amount3.y -= shapeTrans.y;
 	selectedShapeNode->amount3.z -= shapeTrans.z;
+
+	selectedShapeNode->describeNode();
+
+	Node* parent = SG->getParentOfID(selectedShapeNode->ID);
+	parent->describeNode();
 }
 
 //callbacks
@@ -542,6 +547,13 @@ void keyboard(unsigned char key, int x, int y)
 	else if (key == 'x')
 	{
 		initGraph();
+	}
+
+	/* Delete selected node */
+	/*delete key*/
+	else if (key == 127)
+	{
+		SG->deleteNode(selectedShapeNode);
 	}
 
 	glutPostRedisplay();

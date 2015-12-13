@@ -25,9 +25,23 @@ void SceneGraph::goToChild(int i){
 	}
 }
 
-void SceneGraph::goToParent(){
-	if (currentNode->parent != 0)
-		currentNode = currentNode->parent;
+Node* SceneGraph::getParentOfID(int id){
+	getParentOfID(id, rootNode);
+	return nodeToReturn2;
+}
+
+void SceneGraph::getParentOfID(int id, Node* node)
+{
+	if (node->children->size() > 0)
+	{
+		for (int i = 0; i < node->children->size(); i++)
+		{
+			if (node->children->at(i)->ID == id)
+				nodeToReturn2 = node;
+			else
+				getParentOfID(id, node->children->at(i));
+		}
+	} 
 }
 
 //inserts a child node into the current node
@@ -37,20 +51,8 @@ void SceneGraph::insertChildNodeHere(Node *node){
 
 //deletes the current node, relinking the children as necessary
 /* DOES NOT WORK */
-void SceneGraph::deleteThisNode(){
-	if (currentNode->children->size() != 0)
-		return;
-	else
-	{
-
-		/*Delete this node from the parent's vector*/
-		printf("ID of child: %d\n", currentNode->ID);
-		//printf("ID of parent before change: %d\n", currentNode->parent->ID);
-		goToParent();
-		printf("ID of parent: %d\n", currentNode->ID);
-		currentNode->children->pop_back();
-		deleteThisNode();
-	}
+void SceneGraph::deleteNode(Node* node){
+	node->children->clear();
 }
 
 //draw the scenegraph
@@ -98,7 +100,7 @@ Node* SceneGraph::highlightSelectedShape(int id)
 	{
 		goToRoot();
 		highlightSelectedShapes(id, currentNode);
-		return nodeToReturnFromHighlight;
+		return nodeToReturn;
 	}
 }
 
@@ -112,12 +114,12 @@ void SceneGraph::highlightSelectedShapes(int id, Node* node)
 		if (node->children->at(1)->selectedID == node->children->at(1)->ID)
 		{
 			node->children->at(1)->selectedID = 0;
-			nodeToReturnFromHighlight = 0;
+			nodeToReturn = 0;
 		}else
 		{
 			unhighlightAllShapes(rootNode);
 			node->children->at(1)->selectedID = node->children->at(1)->ID;
-			nodeToReturnFromHighlight = node;
+			nodeToReturn = node;
 		}
 	}
 	else

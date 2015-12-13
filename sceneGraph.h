@@ -12,9 +12,9 @@ public:
 	//Scene Graph Navigation
 	void goToRoot();
 	void goToChild(int i);
-	void goToParent();
+	Node* getParentOfID(int id);
 	void insertChildNodeHere(Node *node);
-	void deleteThisNode();					
+	void deleteNode(Node *node);					
 	//Scene Graph Draw
 	void draw();
 	void clearScene();
@@ -26,7 +26,9 @@ private:
 	void printTree(Node *node);
 	Node *currentNode;
 	Node *rootNode;
-	Node *nodeToReturnFromHighlight;
+	Node *nodeToReturn;
+	Node *nodeToReturn2;
+	void getParentOfID(int id, Node *node);
 	std::vector<Node*> translationVector;
 	std::vector<Node*> getTransformations(Node *node);
 	void highlightSelectedShapes(int id, Node *node);
