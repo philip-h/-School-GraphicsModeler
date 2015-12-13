@@ -97,35 +97,38 @@ Node* SceneGraph::highlightSelectedShape(int id)
 	} else
 	{
 		goToRoot();
-		return highlightSelectedShapes(id, currentNode);
+		highlightSelectedShapes(id, currentNode);
+		return nodeToReturnFromHighlight;
 	}
 }
 
-Node* SceneGraph::highlightSelectedShapes(int id, Node* node)
+void SceneGraph::highlightSelectedShapes(int id, Node* node)
 {
 	
 	if (id == node->ID)
 	{
-		unhighlightAllShapes(rootNode);
-		node->children->at(1)->selectedID = node->children->at(1)->ID;
-		return node;
+		
+
+		if (node->children->at(1)->selectedID == node->children->at(1)->ID)
+		{
+			node->children->at(1)->selectedID = 0;
+			nodeToReturnFromHighlight = 0;
+		}else
+		{
+			unhighlightAllShapes(rootNode);
+			node->children->at(1)->selectedID = node->children->at(1)->ID;
+			nodeToReturnFromHighlight = node;
+		}
 	}
 	else
 	{
-		Node *selectedNode;
 		if (node->children->size() > 0)
 		{
 			for (int i = 0; i < node->children->size(); i++)
 			{
-				selectedNode = highlightSelectedShapes(id, node->children->at(i));
-				if (selectedNode == 0)
-				{
-					printf("pointer is 0\n");
-					return 0;
-				}
+				highlightSelectedShapes(id, node->children->at(i));
 			}
 		}
-		return selectedNode;
 	}
 }
 

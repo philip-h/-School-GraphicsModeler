@@ -35,6 +35,9 @@ public:
 	Node* parent;
 	int currentChild;
 
+	Vector3D amount3;
+	Vector4D amount4;
+
 	void draw();
 	virtual void nodeSpecificCodeDown();
 	virtual void nodeSpecificCodeUp();

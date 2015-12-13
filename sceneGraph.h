@@ -26,9 +26,10 @@ private:
 	void printTree(Node *node);
 	Node *currentNode;
 	Node *rootNode;
+	Node *nodeToReturnFromHighlight;
 	std::vector<Node*> translationVector;
 	std::vector<Node*> getTransformations(Node *node);
-	Node* highlightSelectedShapes(int id, Node *node);
+	void highlightSelectedShapes(int id, Node *node);
 	void unhighlightAllShapes(Node *node);
 };
 
