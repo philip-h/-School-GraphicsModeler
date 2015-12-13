@@ -28,6 +28,8 @@ const float cameraSpeed = 0.75f;
 
 enum LightControl {LIGHT0, LIGHT1};
 LightControl lightControl = LIGHT0;
+enum ShapeControl {SHAPES, SCENE};
+ShapeControl shapeControl = SCENE;
 
 /* LIGHTING */
 float light_pos0 [3] = {0, 3, 3};
@@ -57,6 +59,10 @@ int selectedShapeID;
 #include "nodeModel.h"
 #include "nodeTransform.h"
 SceneGraph *SG;
+
+/* Shape trasnformation vectors */
+Vector3D shapeTransformations;
+Node *selectedShapeNode;
 
 //function which will populate a sample graph 
 void initGraph(){
@@ -291,7 +297,19 @@ void Intersect(int x, int y)
 	std::vector<BoundedBox> shapes = calcShapeBoundedBoxes();
 
 	selectedShapeID = checkCollision(shapes, ray);
-	SG->highlightSelectedShape(selectedShapeID);
+	selectedShapeNode = SG->highlightSelectedShape(selectedShapeID);
+	
+	
+	if (selectedShapeNode != 0)
+	{	
+		printf("shapes\n");
+		shapeControl = SHAPES;
+	} else 
+	{
+		printf("scene\n");
+		//selectedShapeNode->describeNode();
+		shapeControl = SCENE;
+	}
 
 	glutPostRedisplay();
 }
@@ -382,26 +400,52 @@ void keyboard(unsigned char key, int x, int y)
 		exit(0);
 	}
 
-	/*WASD+Space+z to control the camera*/
-	else if (key == 'w')
+	/*CAMERA CONTROL AND SHAPE CONTROL*/
+	else if (shapeControl == SCENE)
 	{
-		moveCamera(forward, cameraSpeed);
-	} else if (key == 'a')
+		/*WASD+Space+z to control the camera*/
+		if (key == 'w')
+		{
+			moveCamera(forward, cameraSpeed);
+		} else if (key == 'a')
+		{
+			moveCamera(left, cameraSpeed);
+		} else if (key == 's')
+		{
+			moveCamera(back, cameraSpeed);
+		} else if (key == 'd')
+		{
+			moveCamera(right, cameraSpeed);
+			/* Space bar */
+		}  else if (key == 32)
+		{
+			moveCamera(up, cameraSpeed);
+		} else if (key == 'c')
+		{
+			moveCamera(down, cameraSpeed);
+		}
+	} else if (shapeControl == SHAPES)
 	{
-		moveCamera(left, cameraSpeed);
-	} else if (key == 's')
-	{
-		moveCamera(back, cameraSpeed);
-	} else if (key == 'd')
-	{
-		moveCamera(right, cameraSpeed);
-		/* Space bar */
-	}  else if (key == 32)
-	{
-		moveCamera(up, cameraSpeed);
-	} else if (key == 'c')
-	{
-		moveCamera(down, cameraSpeed);
+		if (key == 'w')
+		{
+			selectedShapeNode->describeNode();
+		} else if (key == 'a')
+		{
+			//moveCamera(left, cameraSpeed);
+		} else if (key == 's')
+		{
+			//moveCamera(back, cameraSpeed);
+		} else if (key == 'd')
+		{
+			//moveCamera(right, cameraSpeed);
+			/* Space bar */
+		}  else if (key == 32)
+		{
+			//moveCamera(up, cameraSpeed);
+		} else if (key == 'c')
+		{
+			//moveCamera(down, cameraSpeed);
+		}
 	}
 
 	/*Z to toggle between moving light sources */

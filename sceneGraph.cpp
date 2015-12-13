@@ -88,18 +88,34 @@ std::vector<Node*> SceneGraph::getTransformations(Node *node)
 
 }
 
-void SceneGraph::highlightSelectedShape(int id)
+Node* SceneGraph::highlightSelectedShape(int id)
 {
-	goToRoot();
-	unhighlightAllShapes(currentNode);
-	highlightSelectedShape(id, currentNode);
+	if (id == -1)
+	{
+		unhighlightAllShapes(rootNode);
+		return 0;
+	} else
+	{
+		goToRoot();
+		return highlightSelectedShapes(id, currentNode);
+	}
 }
 
-void SceneGraph::highlightSelectedShape(int id, Node* node)
+Node* SceneGraph::highlightSelectedShapes(int id, Node* node)
 {
+	Node *selectedNode;
 	if (id == node->ID)
 	{
-		node->children->at(1)->selectedID = node->children->at(1)->ID;
+		if (node->children->at(1)->selectedID == node->children->at(1)->ID)
+		{
+			node->children->at(1)->selectedID = 0;
+			return 0;
+		}else
+		{
+			unhighlightAllShapes(rootNode);
+			node->children->at(1)->selectedID = node->children->at(1)->ID;
+			return node;
+		}
 
 	}
 	else
@@ -108,10 +124,24 @@ void SceneGraph::highlightSelectedShape(int id, Node* node)
 		{
 			for (int i = 0; i < node->children->size(); i++)
 			{
-				highlightSelectedShape(id, node->children->at(i));
+				selectedNode = highlightSelectedShapes(id, node->children->at(i));
+				if (selectedNode == 0)
+				{
+					printf("pointer is 0\n");
+					return 0;
+				}
 			}
 		}
+		return selectedNode;
 	}
+}
+
+int fact (int n)
+{
+	if (n == 1)
+		return 1;
+	else
+		return fact (n-1) * n;
 }
 
 void SceneGraph::unhighlightAllShapes(Node *node)

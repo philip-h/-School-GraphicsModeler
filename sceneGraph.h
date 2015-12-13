@@ -20,7 +20,7 @@ public:
 	void clearScene();
 	std::vector<Node*> getTransformations();
 	void printTree();
-	void highlightSelectedShape(int id);
+	Node* highlightSelectedShape(int id);
 
 private:
 	void printTree(Node *node);
@@ -28,7 +28,7 @@ private:
 	Node *rootNode;
 	std::vector<Node*> translationVector;
 	std::vector<Node*> getTransformations(Node *node);
-	void highlightSelectedShape(int id, Node *node);
+	Node* highlightSelectedShapes(int id, Node *node);
 	void unhighlightAllShapes(Node *node);
 };
 
