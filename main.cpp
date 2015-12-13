@@ -65,17 +65,18 @@ SceneGraph *SG;
 Vector3D shapeTransformations;
 Node *selectedShapeNode;
 
+
+
 //function which will populate a sample graph 
 void initGraph(){
-
+	/* Vector to hold the initial shapes of the scene*/
+	std::vector<ModelType> models;
 	/* Node group for transformations */
 	NodeGroup *group;
 	/* Initial transformation objects*/
 	NodeTransform *translation, *rotation, *scale;
 	/* Node model to draw the shape */
 	NodeModel *model;
-	/* Vector to hold the initial shapes of the scene*/
-	std::vector<ModelType> models;
 	
 
 	/* Vector to hold the initial positions of each shape in the scene */
@@ -555,6 +556,51 @@ void keyboard(unsigned char key, int x, int y)
 	{
 		SG->deleteNode(selectedShapeNode);
 	}
+
+	// /* Create new Node */
+	else if (key == 'n')
+	{
+
+		/* Node group for transformations */
+		NodeGroup *group;
+		/* Initial transformation objects*/
+		NodeTransform *translation, *rotation, *scale;
+		/* Node model to draw the shape */
+		NodeModel *model;
+
+		int shape = rand() % 3;
+		
+		ModelType myShape = ModelType(shape);
+		SG->goToRoot();
+		int childrenNum = SG->getChildrenThisNode();
+
+		group = new NodeGroup();
+		SG->insertChildNodeHere(group);
+		SG->goToChild(childrenNum);
+
+		/*Apply rotation to each stand*/
+		rotation = new NodeTransform(Rotate);
+		SG->insertChildNodeHere(rotation);
+		SG->goToChild(0);
+		/* Apply scaling to each stand*/
+		scale = new NodeTransform(Scale);
+		SG->insertChildNodeHere(scale);
+		SG->goToChild(0);
+		/* Apply translation to each stand*/
+		translation = new NodeTransform(Translate);
+		SG->insertChildNodeHere(translation);
+		SG->goToChild(0);
+		/* Draw each stand */
+		model = new NodeModel(myShape);
+		SG->insertChildNodeHere(model);
+
+		model = new NodeModel(WireCube);
+		SG->insertChildNodeHere(model);
+		SG->highlightSelectedShape(SG->getCurrentNode()->ID);
+
+		SG->goToRoot();
+	}
+
 
 	glutPostRedisplay();
 }

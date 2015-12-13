@@ -7,8 +7,8 @@
 enum ModelType{
 	Sphere,
 	Cube,
-	WireCube,
 	Teapot,
+	WireCube,
 	Custom
 };
 

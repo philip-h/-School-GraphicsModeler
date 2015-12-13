@@ -21,6 +21,8 @@ public:
 	std::vector<Node*> getTransformations();
 	void printTree();
 	Node* highlightSelectedShape(int id);
+	int getChildrenThisNode();
+	Node* getCurrentNode();
 
 private:
 	void printTree(Node *node);

@@ -52,6 +52,10 @@ void SceneGraph::insertChildNodeHere(Node *node){
 //deletes the current node, relinking the children as necessary
 /* DOES NOT WORK */
 void SceneGraph::deleteNode(Node* node){
+	node = getParentOfID(node->ID);//scale
+	node = getParentOfID(node->ID);//roatte
+	node = getParentOfID(node->ID);//group
+
 	node->children->clear();
 }
 
@@ -172,4 +176,14 @@ void SceneGraph::printTree(Node *node)
 			printTree(node->children->at(i));
 		}
 	}
+}
+
+int SceneGraph::getChildrenThisNode()
+{
+	return currentNode->children->size();
+}
+
+Node* SceneGraph::getCurrentNode()
+{
+	return currentNode;
 }

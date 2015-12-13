@@ -52,7 +52,7 @@ NodeTransform::NodeTransform(TransformType whatType)
 		amount3.x = 0;
 		amount3.y = 0; 
 		amount3.z = 0;
-		isTranslation = 0;
+		isTranslation = true;
 	} else if (transformationType == Scale)
 	{
 		amount3.x = 1;
