@@ -7,7 +7,16 @@ NodeTransform::NodeTransform(TransformType whatType, Vector3D vec3){
 	nodeType = transformation;
 	transformationType = whatType;
 	amount3 = vec3;
-	isTransformation = true;
+	if (transformationType == Rotate)
+	{
+		isRotation = true;
+	} else if (transformationType == Translate)
+	{
+		isTranslation = true;
+	} else if (transformationType == Scale)
+	{
+		isScale = true;
+	}
 }
 
 //for gl rotate
@@ -15,13 +24,21 @@ NodeTransform::NodeTransform(TransformType whatType, Vector4D vec4){
 	nodeType = transformation;
 	transformationType = whatType;
 	amount4 = vec4;
-	isTransformation = true;
+	if (transformationType == Rotate)
+	{
+		isRotation = true;
+	} else if (transformationType == Translate)
+	{
+		isTranslation = true;
+	} else if (transformationType == Scale)
+	{
+		isScale = true;
+	}
 }
 
 NodeTransform::NodeTransform(TransformType whatType)
 {
 	transformationType = whatType;
-	isTransformation = true;
 
 	if (transformationType == Rotate)
 	{
@@ -29,16 +46,19 @@ NodeTransform::NodeTransform(TransformType whatType)
 		amount4.x = 0;
 		amount4.y = 0;
 		amount4.z = 0;
+		isRotation = true;
 	} else if (transformationType == Translate)
 	{
 		amount3.x = 0;
 		amount3.y = 0; 
 		amount3.z = 0;
+		isTranslation = 0;
 	} else if (transformationType == Scale)
 	{
 		amount3.x = 1;
 		amount3.y = 1;
 		amount3.z = 1;
+		isRotation = true;
 	}
 }
 
@@ -72,7 +92,7 @@ Vector3D NodeTransform::getShapePosition() {
 
 void NodeTransform::describeNode()
 {
-	printf("This is a transform node: transformation: ");
+	printf("This is a transform node(ID %d): transformation: ", ID);
 	switch (transformationType){
 	case Translate:
 		printf("Translate by (%.2f,%.2f,%.2f)\n", amount3.x, amount3.y, amount3.z);

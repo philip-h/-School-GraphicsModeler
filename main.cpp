@@ -8,6 +8,7 @@
 #include "structs.h"
 #include "PMath/PVector.h"
 #include "BoundedBox.h"
+#include "ray.h"
 
 /* Rotations on the 3 axes */
 float xyzRotation[] = {-11, 40, 0};
@@ -48,6 +49,8 @@ int getID(){
 	return masterID++;
 }
 
+int selectedShapeID;
+
 //sceneGraph
 #include "sceneGraph.h"
 #include "nodeGroup.h"
@@ -55,12 +58,8 @@ int getID(){
 #include "nodeTransform.h"
 SceneGraph *SG;
 
-//Vector of bounded boxes
-std::vector<BoundedBox> boundedBoxes;
-
 //function which will populate a sample graph 
 void initGraph(){
-
 
 	/* Node group for transformations */
 	NodeGroup *group;
@@ -158,26 +157,151 @@ void initGraph(){
 	}
 }
 
-void calcShapeBoundedBoxes()
+std::vector<BoundedBox> calcShapeBoundedBoxes()
 {
-	boundedBoxes.clear();
-	std::vector<Vector3D> trans = SG->getTransformations();
-
+	std::vector<BoundedBox> boundedBoxes;
+	std::vector<Node*> translations = SG->getTransformations();
+	
 	Vector3D p1, p2;
-	for (int i = 0; i < trans.size(); i++)
+	for (int i = 0; i < translations.size(); i++)
 	{
-		p1.x = trans[i].x - 0.5f;
-		p1.y = trans[i].y + 0.5f;
-		p1.z = trans[i].z - 0.5f;
+		p1 = translations[i]->getShapePosition();
+		p2 = translations[i]->getShapePosition();
+		
+		p1.x -= 0.5f;
+		p1.y += 0.5f;
+		p1.z -= 0.5f;
+ 
+		p2.x += 0.5f;
+		p2.y -= 0.5f;
+		p2.z += 0.5f;
 
-		p2.x = trans[i].x + 0.5f;
-		p2.y = trans[i].y - 0.5f;
-		p2.z = trans[i].z + 0.5f;
+		int shapeId = translations[i]->ID;
 
-		BoundedBox boundedBox(p1,p2,0);
+		BoundedBox boundedBox(p1,p2,shapeId);
 		boundedBoxes.push_back(boundedBox);
 
 	}
+
+	return boundedBoxes;
+}
+
+std::vector<Vector3D> checkCollision(BoundedBox box, Ray ray)
+{
+
+	//contains array with our closest intersection point of the ray to our bounded box. If empty no intersection.
+	std::vector<Vector3D> intersectPoint;
+
+	//Get the bounding points of our box
+	Vector3D min = box.min; //p1
+	Vector3D max = box.max; //p2
+
+ 	double tmin = (min.x - ray.orig.x) / ray.dir.x;
+	double tmax = (max.x - ray.orig.x) / ray.dir.x;
+
+	if (tmin > tmax){
+		std::swap(tmin, tmax);
+	}
+
+	double tymin = (min.y - ray.orig.y) / ray.dir.y;
+	double tymax = (max.y - ray.orig.y) / ray.dir.y;
+
+	if (tymin > tymax){
+		std::swap(tymin, tymax);
+	}
+
+	if ((tmin > tymax) || (tymin > tmax)) {
+		return intersectPoint; //false no intersection return empty intersect point array
+	}
+
+	if (tymin > tmin) {
+		tmin = tymin;
+	}
+
+	if (tymax < tmax){
+		tmax = tymax;
+	}
+
+	double tzmin = (min.z - ray.orig.z) / ray.dir.z;
+	double tzmax = (max.z - ray.orig.z) / ray.dir.z;
+
+	if (tzmin > tzmax){
+		std::swap(tzmin, tzmax);
+	}
+
+	if ((tmin > tzmax) || (tzmin > tmax)){
+		return intersectPoint; //false no intersection return empty intersect point array
+	}
+
+	if (tzmin > tmin){
+		tmin = tzmin;
+	}
+
+	if (tzmax < tmax){
+		tmax = tzmax;
+	}
+
+	Vector3D point;
+	point.x = ray.orig.x + ray.dir.x*tmin;
+	point.y = ray.orig.y + ray.dir.y*tmin;
+	point.z = ray.orig.z + ray.dir.z*tmin;
+
+	intersectPoint.push_back(point);
+
+	//true there is an intersection. return the intersect point in array.
+	return intersectPoint;
+}
+
+void Intersect(int x, int y)
+{
+
+	//allocate matricies memory
+	double matModelView[16], matProjection[16];
+	int viewport[4];
+
+	//grab the matricies
+	glGetDoublev(GL_MODELVIEW_MATRIX, matModelView);
+	glGetDoublev(GL_PROJECTION_MATRIX, matProjection);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+
+	//unproject the values
+	double winX = (double)x;
+	double winY = viewport[3] - (double)y;
+
+	double start[] = {0,0,0};
+	double end[] = {1,1,1};
+
+	// get point on the 'near' plane (third param is set to 0.0)
+	gluUnProject(winX, winY, 0.0, matModelView, matProjection,
+         viewport, &start[0], &start[1], &start[2]);
+
+	// get point on the 'far' plane (third param is set to 1.0)
+	gluUnProject(winX, winY, 1.0, matModelView, matProjection,
+         viewport, &end[0], &end[1], &end[2]);
+
+	//create new ray with the origin as the mouse click start position
+	Ray ray = Ray(start, end);
+
+	std::vector<BoundedBox> shapes = calcShapeBoundedBoxes();
+
+	double closest_distance = -1;
+	std::vector<Vector3D> intersectPoint;
+	selectedShapeID = -1;
+	for (int i=0; i<shapes.size(); i++){
+		intersectPoint = checkCollision(shapes[i], ray);
+
+		if (!intersectPoint.empty()){
+			selectedShapeID = shapes[i].shapeId;
+			//printf("Shape hit!! ID: %d\n", selectedShapeID);
+		} 
+	}
+
+	Node *node = SG->findNodeById(selectedShapeID);
+	if (node != NULL)
+		node->describeNode();
+	else
+		printf("NULL NODe\n");
+	printf("%d\n", selectedShapeID);
 }
 
 void drawAxis()
@@ -388,6 +512,13 @@ void special(int key, int x, int y)
 	glutPostRedisplay();
 }
 
+void mouse(int button, int state, int x, int y)
+{
+	if(button ==  GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+		Intersect(x,y);
+	}
+}
+
 void init(void)
 {	
 	 /* LIGHTING */
@@ -412,6 +543,8 @@ void init(void)
 
 	//initializing our world
 	initGraph();
+
+
 
 }
 
@@ -452,7 +585,6 @@ void display(void)
 	drawLight();
 	//draw the sceneGraph
 	SG->draw();
-	calcShapeBoundedBoxes();
 
 	glutSwapBuffers();
 }
@@ -473,6 +605,7 @@ int main(int argc, char** argv)
 	glutDisplayFunc(display);	//registers "display" as the display callback function
 	glutKeyboardFunc(keyboard);
 	glutSpecialFunc(special);
+	glutMouseFunc(mouse);
 
 	init();
 
