@@ -88,23 +88,19 @@ std::vector<Node*> SceneGraph::getTransformations(Node *node)
 
 }
 
-Node* SceneGraph::findNodeById(int id)
+void SceneGraph::highlightSelectedShape(int id)
 {
-	if (id == -1)
-		return NULL;
-	else
-	{
-		goToRoot();
-		findNodeById(id, currentNode);
-	}
+	goToRoot();
+	unhighlightAllShapes(currentNode);
+	highlightSelectedShape(id, currentNode);
 }
 
-Node* SceneGraph::findNodeById(int id, Node* node)
+void SceneGraph::highlightSelectedShape(int id, Node* node)
 {
 	if (id == node->ID)
 	{
-		printf("");
-		return node;
+		node->children->at(1)->selectedID = node->children->at(1)->ID;
+
 	}
 	else
 	{
@@ -112,8 +108,21 @@ Node* SceneGraph::findNodeById(int id, Node* node)
 		{
 			for (int i = 0; i < node->children->size(); i++)
 			{
-				findNodeById(id, node->children->at(i));
+				highlightSelectedShape(id, node->children->at(i));
 			}
+		}
+	}
+}
+
+void SceneGraph::unhighlightAllShapes(Node *node)
+{
+	node->selectedID = 0;
+
+	if (node->children->size() > 0)
+	{
+		for (int i = 0; i < node->children->size(); i++)
+		{
+			unhighlightAllShapes(node->children->at(i));
 		}
 	}
 }

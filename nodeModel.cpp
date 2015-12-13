@@ -11,7 +11,6 @@ NodeModel::NodeModel(ModelType whatType){	//constructor
 //as the node moves down through it, we want to perform down action
 //which in this case means drawing the model
 void NodeModel::nodeSpecificCodeDown(){
-	
 	switch (modelType){
 	case Sphere:
 		glutSolidSphere(0.6, 12, 10);
@@ -20,10 +19,13 @@ void NodeModel::nodeSpecificCodeDown(){
 		glutSolidCube(1);
 		break;
 	case WireCube:
-		glDisable(GL_LIGHTING);
-		glColor3f(0.0f, 1.0f, 0.0f);
-		glutWireCube(1);
-		glEnable(GL_LIGHTING);
+		if (selectedID == ID)
+		{
+			glDisable(GL_LIGHTING);
+			glColor3f(0.0f, 1.0f, 0.0f);
+			glutWireCube(1);
+			glEnable(GL_LIGHTING);
+		} 
 		break;
 	case Teapot:
 		glutSolidTeapot(.67);

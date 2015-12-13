@@ -186,70 +186,76 @@ std::vector<BoundedBox> calcShapeBoundedBoxes()
 	return boundedBoxes;
 }
 
-std::vector<Vector3D> checkCollision(BoundedBox box, Ray ray)
+/**
+ * This method returns an array of intersection point. If the ray intersects the bounding box then
+ * return the closest intersection point. If no intersection return empty array.
+ */
+int checkCollision(std::vector<BoundedBox> shapes, Ray ray)
 {
+	double smallestTmin = 100000;
+	int selectedShape = -1;
 
-	//contains array with our closest intersection point of the ray to our bounded box. If empty no intersection.
-	std::vector<Vector3D> intersectPoint;
+	for (int i=0; i<shapes.size(); i++){
+		BoundedBox box = shapes[i];
 
-	//Get the bounding points of our box
-	Vector3D min = box.min; //p1
-	Vector3D max = box.max; //p2
+		//Get the bounding points of our box
+		Vector3D min = box.min; //p1
+		Vector3D max = box.max; //p2
 
- 	double tmin = (min.x - ray.orig.x) / ray.dir.x;
-	double tmax = (max.x - ray.orig.x) / ray.dir.x;
+	 	double tmin = (min.x - ray.orig.x) / ray.dir.x;
+		double tmax = (max.x - ray.orig.x) / ray.dir.x;
 
-	if (tmin > tmax){
-		std::swap(tmin, tmax);
+		if (tmin > tmax){
+			std::swap(tmin, tmax);
+		}
+
+		double tymin = (min.y - ray.orig.y) / ray.dir.y;
+		double tymax = (max.y - ray.orig.y) / ray.dir.y;
+
+		if (tymin > tymax){
+			std::swap(tymin, tymax);
+		}
+
+		if ((tmin > tymax) || (tymin > tmax)) {
+			continue; // no intersection point continue to next bounded box
+		}
+
+		if (tymin > tmin) {
+			tmin = tymin;
+		}
+
+		if (tymax < tmax){
+			tmax = tymax;
+		}
+
+		double tzmin = (min.z - ray.orig.z) / ray.dir.z;
+		double tzmax = (max.z - ray.orig.z) / ray.dir.z;
+
+		if (tzmin > tzmax){
+			std::swap(tzmin, tzmax);
+		}
+
+		if ((tmin > tzmax) || (tzmin > tmax)){
+			continue; // no intersection point continue to next bounded box
+		}
+
+		if (tzmin > tmin){
+			tmin = tzmin;
+		}
+
+		if (tzmax < tmax){
+			tmax = tzmax;
+		}
+
+		//There is an intersection point. Now we want to check if it is the closest intersection point to our ray.
+		//If so then remove the previous intersection point and set it to this new intersection point.
+		if (tmin < smallestTmin){
+			smallestTmin = tmin;
+			selectedShape = box.shapeId;
+		}
 	}
-
-	double tymin = (min.y - ray.orig.y) / ray.dir.y;
-	double tymax = (max.y - ray.orig.y) / ray.dir.y;
-
-	if (tymin > tymax){
-		std::swap(tymin, tymax);
-	}
-
-	if ((tmin > tymax) || (tymin > tmax)) {
-		return intersectPoint; //false no intersection return empty intersect point array
-	}
-
-	if (tymin > tmin) {
-		tmin = tymin;
-	}
-
-	if (tymax < tmax){
-		tmax = tymax;
-	}
-
-	double tzmin = (min.z - ray.orig.z) / ray.dir.z;
-	double tzmax = (max.z - ray.orig.z) / ray.dir.z;
-
-	if (tzmin > tzmax){
-		std::swap(tzmin, tzmax);
-	}
-
-	if ((tmin > tzmax) || (tzmin > tmax)){
-		return intersectPoint; //false no intersection return empty intersect point array
-	}
-
-	if (tzmin > tmin){
-		tmin = tzmin;
-	}
-
-	if (tzmax < tmax){
-		tmax = tzmax;
-	}
-
-	Vector3D point;
-	point.x = ray.orig.x + ray.dir.x*tmin;
-	point.y = ray.orig.y + ray.dir.y*tmin;
-	point.z = ray.orig.z + ray.dir.z*tmin;
-
-	intersectPoint.push_back(point);
-
 	//true there is an intersection. return the intersect point in array.
-	return intersectPoint;
+	return selectedShape;
 }
 
 void Intersect(int x, int y)
@@ -284,24 +290,10 @@ void Intersect(int x, int y)
 
 	std::vector<BoundedBox> shapes = calcShapeBoundedBoxes();
 
-	double closest_distance = -1;
-	std::vector<Vector3D> intersectPoint;
-	selectedShapeID = -1;
-	for (int i=0; i<shapes.size(); i++){
-		intersectPoint = checkCollision(shapes[i], ray);
+	selectedShapeID = checkCollision(shapes, ray);
+	SG->highlightSelectedShape(selectedShapeID);
 
-		if (!intersectPoint.empty()){
-			selectedShapeID = shapes[i].shapeId;
-			//printf("Shape hit!! ID: %d\n", selectedShapeID);
-		} 
-	}
-
-	Node *node = SG->findNodeById(selectedShapeID);
-	if (node != NULL)
-		node->describeNode();
-	else
-		printf("NULL NODe\n");
-	printf("%d\n", selectedShapeID);
+	glutPostRedisplay();
 }
 
 void drawAxis()
